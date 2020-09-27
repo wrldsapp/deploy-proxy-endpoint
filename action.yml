@@ -1,0 +1,17 @@
+name: 'API Gateway Proxy Integration'
+description: 'Synchronizes API Gateway proxy endpoints with Lambda monorepo.'
+inputs:
+  functions:
+    description: "The created/deleted functions from the previous step."
+  parentId:
+    description: 'The ID of the root path resource in API Gateway.'
+    required: true
+  apiId: 
+    description: 'The ID of the API Gateway API to configure endpoints.'
+    required: true
+  env:
+    desription: 'The development environment to deploy to.'
+    required: true
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
