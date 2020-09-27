@@ -1,11 +1,7 @@
 const AWS = require('aws-sdk');
 const core = require('@actions/core');
-
 const parentId = core.getInput('parentId');
 const apiId = core.getInput('apiId');
-const env = core.getInput('env');
-const functions = JSON.parse(core.getInput('functions'));
-
 var apigateway = new AWS.APIGateway();
 
 // 1. Add a resource
@@ -112,6 +108,7 @@ function logOutput(output) {
 
 
 try {
+    const functions = JSON.parse(core.getInput('functions'));
     Promise.allSettled([
         createEndpoints(functions.created),
         deleteEndpoints(functions.deleted),
