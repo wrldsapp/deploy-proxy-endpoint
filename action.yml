@@ -9,9 +9,6 @@ inputs:
   apiId: 
     description: 'The ID of the API Gateway API to configure endpoints.'
     required: true
-  env:
-    desription: 'The development environment to deploy to.'
-    required: true
 runs:
   using: 'node12'
   main: 'dist/index.js'

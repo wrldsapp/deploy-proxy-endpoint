@@ -4,9 +4,7 @@ const core = require('@actions/core');
 const parentId = core.getInput('parentId');
 const apiId = core.getInput('apiId');
 const env = core.getInput('env');
-
-const newFunctions = require(`${process.env.HOME}/newFunctions.json`);
-const deletedFunctions = require(`${process.env.HOME}/deletedFunctions.json`);
+const functions = JSON.parse(core.getInput('functions'));
 
 var apigateway = new AWS.APIGateway();
 
@@ -15,21 +13,16 @@ var apigateway = new AWS.APIGateway();
 // 3. Pass back the path for the endpoint.
 
 
-async function createEndpoints() {
-    return new Promise(function(resolve, reject) {
-        const resources = [];
-        for (i in newFunctions) {
-            addResource(newFunctions[i].name)
-            .then(resource => {
-                resources.push(resource);
-                addMethod(resource.id)
-                .then(() => {
-                    addIntegration(resource.id, newFunctions[i].arn);
-                });
-            });
-        }
-        resolve(resources); // Return the resources to show success message.
-    });
+async function createEndpoints(created) {
+    console.log("Created", created);
+    return await Promise.all(created.map(async (x) => {
+        let resource = await addResource(x.name);
+        console.log("Resource", resource);
+        await addMethod(resource.id).then(async () => {
+            await addIntegration(resource.id, x.arn);
+            resolve(resource);
+        });
+    }));
 }
 
 
@@ -119,12 +112,12 @@ function logOutput(output) {
 
 
 try {
-    Promise.all([
-        createEndpoints,
-        deleteEndpoints,
+    Promise.allSettled([
+        createEndpoints(functions.created),
+        deleteEndpoints(functions.deleted),
     ]).then(output => {
         logOutput(output);
     });
 } catch (err) {
-
+    core.setFailed('Err');
 }
