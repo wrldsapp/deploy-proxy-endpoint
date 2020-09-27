@@ -116,5 +116,5 @@ try {
         logOutput(output);
     });
 } catch (err) {
-    core.setFailed('Err');
+    core.setFailed(err);
 }
